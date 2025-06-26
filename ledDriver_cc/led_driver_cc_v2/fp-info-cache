@@ -1,4 +1,4 @@
-24642545559506191
+24651299833906325
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -55195,6 +55195,13 @@ SMD SMT ceramic resonator filter filter hand-soldering
 3
 3
 Desktop
+frauscher_logo_50x4
+
+
+0
+0
+0
+Desktop
 positiv_terminal
 
 
@@ -99357,3 +99364,31 @@ Varistor VF
 0
 2
 2
+custom_footprints
+ESP32-S3-Zero
+
+
+0
+18
+18
+custom_footprints
+Fuse_Littelfuse-NANO2-451_453
+Littelfuse NANO2 https://www.littelfuse.com/~/media/electronics/datasheets/fuses/littelfuse_fuse_451_453_datasheet.pdf.pdf
+Fuse Nano2
+0
+2
+2
+custom_footprints
+SLF10145
+SLF10145
+Inductor
+0
+2
+2
+custom_logos
+frauscher_logo_50x4
+
+
+0
+0
+0

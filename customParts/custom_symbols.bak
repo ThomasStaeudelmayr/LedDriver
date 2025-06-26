@@ -22,7 +22,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "custom_footprints:ESP32-S3-Zero"
 			(at -78.74 0 0)
 			(effects
 				(font
@@ -31,7 +31,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.waveshare.com/wiki/ESP32-S3-Zero"
 			(at -78.74 0 0)
 			(effects
 				(font

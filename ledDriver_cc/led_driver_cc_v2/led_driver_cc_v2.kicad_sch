@@ -4421,7 +4421,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Inductor_SMD:L_10.4x10.4_H4.8"
+		(property "Footprint" "Inductor_SMD:L_TDK_SLF10145"
 			(at 270.51 135.89 0)
 			(effects
 				(font
@@ -5465,7 +5465,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Fuse:Fuseholder_Littelfuse_Nano2_154x"
+		(property "Footprint" "custom_footprints:Fuse_Littelfuse-NANO2-451_453"
 			(at 54.61 204.978 90)
 			(effects
 				(font

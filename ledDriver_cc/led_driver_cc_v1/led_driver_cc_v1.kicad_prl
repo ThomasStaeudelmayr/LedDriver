@@ -39,6 +39,7 @@
       9,
       10,
       11,
+      12,
       13,
       14,
       15,
@@ -73,7 +74,7 @@
     "ssh_key": ""
   },
   "meta": {
-    "filename": "led_driver.kicad_prl",
+    "filename": "led_driver_cc_v1.kicad_prl",
     "version": 3
   },
   "project": {

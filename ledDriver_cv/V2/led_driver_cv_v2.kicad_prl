@@ -21,7 +21,7 @@
       "footprints": true,
       "graphics": true,
       "keepouts": true,
-      "lockedItems": true,
+      "lockedItems": false,
       "otherItems": true,
       "pads": true,
       "text": true,
@@ -57,7 +57,7 @@
     "ssh_key": ""
   },
   "meta": {
-    "filename": "led_driver_cc_v2.kicad_prl",
+    "filename": "led_driver_cv_v2.kicad_prl",
     "version": 5
   },
   "net_inspector_panel": {

@@ -37,9 +37,9 @@
         "other_text_thickness": 0.15,
         "other_text_upright": false,
         "pads": {
-          "drill": 0.0,
-          "height": 0.68,
-          "width": 1.2
+          "drill": 2.7,
+          "height": 3.1,
+          "width": 3.1
         },
         "silk_line_width": 0.15,
         "silk_text_italic": false,
@@ -428,7 +428,6 @@
     "rule_severities": {
       "bus_definition_conflict": "error",
       "bus_entry_needed": "error",
-      "bus_label_syntax": "error",
       "bus_to_bus_conflict": "error",
       "bus_to_net_conflict": "error",
       "conflicting_netclasses": "error",
@@ -477,7 +476,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "led_driver_cc_v2.kicad_pro",
+    "filename": "led_driver_cv_v2.kicad_pro",
     "version": 3
   },
   "net_settings": {

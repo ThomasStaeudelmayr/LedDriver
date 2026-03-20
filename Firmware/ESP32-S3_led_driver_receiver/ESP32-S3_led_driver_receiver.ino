@@ -11,13 +11,7 @@
 #define PWM_FREQ 5000
 #define PWM_RESOLUTION 10  // 10-bit (0–1023)
 
-// PWM channels
-#define CH_RED   0
-#define CH_GREEN 1
-#define CH_BLUE  2
-#define CH_WHITE 3
-
-// Structure for incoming RGBW data
+// Structure for incoming RGBW data - Must match transmitter!
 typedef struct struct_message {
   int red;
   int green;
@@ -29,7 +23,6 @@ struct_message rgbwData;
 
 // Callback when data is received
 void OnDataRecv(const esp_now_recv_info_t *info, const uint8_t *incomingData, int len) {
-
   if (len != sizeof(rgbwData)) {
     Serial.println("Invalid data size received!");
     return;
@@ -37,11 +30,11 @@ void OnDataRecv(const esp_now_recv_info_t *info, const uint8_t *incomingData, in
 
   memcpy(&rgbwData, incomingData, sizeof(rgbwData));
 
-  // Apply PWM
-  ledcWrite(CH_RED,   rgbwData.red);
-  ledcWrite(CH_GREEN, rgbwData.green);
-  ledcWrite(CH_BLUE,  rgbwData.blue);
-  ledcWrite(CH_WHITE, rgbwData.white);
+  // Apply PWM using the updated API
+  ledcWrite(redLedPin,   rgbwData.red);
+  ledcWrite(greenLedPin, rgbwData.green);
+  ledcWrite(blueLedPin,  rgbwData.blue);
+  ledcWrite(whiteLedPin, rgbwData.white);
 
   Serial.printf("Received - R:%d G:%d B:%d W:%d\n",
                 rgbwData.red,
@@ -52,43 +45,30 @@ void OnDataRecv(const esp_now_recv_info_t *info, const uint8_t *incomingData, in
 
 void setup() {
   Serial.begin(115200);
-  delay(100);
+  delay(1000);
 
-  // WiFi in station mode
   WiFi.mode(WIFI_STA);
+  delay(1000);
 
-  // Setup PWM channels
-  ledcSetup(CH_RED, PWM_FREQ, PWM_RESOLUTION);
-  ledcSetup(CH_GREEN, PWM_FREQ, PWM_RESOLUTION);
-  ledcSetup(CH_BLUE, PWM_FREQ, PWM_RESOLUTION);
-  ledcSetup(CH_WHITE, PWM_FREQ, PWM_RESOLUTION);
+  // NEW LEDC API (v3.0+)
+  // Format: ledcAttach(pin, frequency, resolution);
+  ledcAttach(redLedPin,   PWM_FREQ, PWM_RESOLUTION);
+  ledcAttach(greenLedPin, PWM_FREQ, PWM_RESOLUTION);
+  ledcAttach(blueLedPin,  PWM_FREQ, PWM_RESOLUTION);
+  ledcAttach(whiteLedPin, PWM_FREQ, PWM_RESOLUTION);
 
-  // Attach pins to PWM channels
-  ledcAttachPin(redLedPin, CH_RED);
-  ledcAttachPin(greenLedPin, CH_GREEN);
-  ledcAttachPin(blueLedPin, CH_BLUE);
-  ledcAttachPin(whiteLedPin, CH_WHITE);
-
-  // Turn off LEDs initially
-  ledcWrite(CH_RED, 0);
-  ledcWrite(CH_GREEN, 0);
-  ledcWrite(CH_BLUE, 0);
-  ledcWrite(CH_WHITE, 0);
-
-  // Print MAC address
+  // Print MAC address (Copy this into your Transmitter code!)
   Serial.print("MAC Address: ");
   Serial.println(WiFi.macAddress());
 
-  // Init ESP-NOW
   if (esp_now_init() != ESP_OK) {
     Serial.println("Error initializing ESP-NOW");
     return;
   }
 
-  // Register callback
   esp_now_register_recv_cb(OnDataRecv);
 }
 
 void loop() {
-  // Nothing needed
+  // Stay chill, the callback handles the work
 }

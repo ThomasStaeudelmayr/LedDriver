@@ -1,0 +1,36 @@
+# Gitignore for ledDriver Project
+
+# --- KiCad (Hardware) ---
+# Ignore backup files created by KiCad
+*.bck
+*.kicad_pcb-bak
+*.sch-bak
+*~
+_autosave-*
+*.tmp
+fp-info-cache
+
+# --- Arduino / Firmware ---
+# Build folders and binaries
+build/
+bin/
+*.hex
+*.elf
+*.bin
+
+# --- Python / Software ---
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# --- OS / IDE ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

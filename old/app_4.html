@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pure RGB Master Dimmer</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #0a0a0a; color: white; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .card { background: #161616; padding: 30px; border-radius: 25px; width: 350px; text-align: center; box-shadow: 0 15px 50px rgba(0,0,0,0.8); border: 1px solid #222; }
+        
+        canvas { border-radius: 50%; cursor: crosshair; margin: 20px 0; border: 5px solid #222; background: #000; }
+        
+        .slider-group { margin: 20px 0; text-align: left; }
+        label { display: block; font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+        
+        input[type="range"] { width: 100%; height: 6px; border-radius: 3px; background: #333; accent-color: #00e676; cursor: pointer; -webkit-appearance: none; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: #00e676; border-radius: 50%; }
+
+        #connectBtn { background: #00e676; color: black; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s; margin-bottom: 10px; }
+        #connectBtn.active { background: #333; color: #00e676; }
+        
+        .val-preview { font-family: 'Courier New', monospace; color: #00e676; background: #000; padding: 10px; border-radius: 8px; margin-top: 20px; font-size: 14px; border: 1px solid #333; }
+    </style>
+</head>
+<body>
+
+    <button id="connectBtn">CONNECT SERIAL</button>
+
+    <div class="card">
+        <canvas id="colorWheel" width="280" height="280"></canvas>
+        
+        <div class="slider-group">
+            <label>Saturation (Color Richness)</label>
+            <input type="range" id="sat" min="0" max="100" value="100">
+        </div>
+
+        <div class="slider-group">
+            <label>Luminance (Master Brightness)</label>
+            <input type="range" id="lum" min="0" max="100" value="100">
+        </div>
+
+        <div id="debug" class="val-preview">R:0 G:0 B:0 W:0</div>
+    </div>
+
+    <script>
+        let port, writer;
+        let currentHue = 0;
+        const canvas = document.getElementById('colorWheel');
+        const ctx = canvas.getContext('2d');
+        const radius = canvas.width / 2;
+        const maxPwm = 1023;
+
+        // Draw the color wheel
+        function drawWheel() {
+            for (let angle = 0; angle < 360; angle++) {
+                let startAngle = (angle - 1) * Math.PI / 180;
+                let endAngle = (angle + 1) * Math.PI / 180;
+                ctx.beginPath();
+                ctx.moveTo(radius, radius);
+                ctx.arc(radius, radius, radius, startAngle, endAngle);
+                ctx.fillStyle = `hsl(${angle}, 100%, 50%)`;
+                ctx.fill();
+            }
+        }
+        drawWheel();
+
+        // Conversion logic: Pure RGB scaling
+        function calculateRGBW(h, s, l) {
+            s /= 100;
+            l /= 100; // This is now our Master Dimmer (0.0 to 1.0)
+
+            // HSL to RGB conversion (using 0.5 as the baseline for full color)
+            const k = n => (n + h / 30) % 12;
+            const a = s * 0.5; 
+            const f = n => 0.5 - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+
+            // Get the base RGB values (scaled to 1.0)
+            let r = f(0) * 2;
+            let g = f(8) * 2;
+            let b = f(4) * 2;
+
+            // Apply Luminance as a straight multiplier (The Dimmer)
+            return {
+                r: Math.round(r * l * maxPwm),
+                g: Math.round(g * l * maxPwm),
+                b: Math.round(b * l * maxPwm),
+                w: 0 // White is forced to 0 as requested
+            };
+        }
+
+        async function updateAndSend() {
+            const s = document.getElementById('sat').value;
+            const l = document.getElementById('lum').value;
+            
+            const rgbw = calculateRGBW(currentHue, s, l);
+            const payload = `${rgbw.r}:${rgbw.g}:${rgbw.b}:${rgbw.w}\n`;
+            
+            document.getElementById('debug').innerText = payload.trim();
+
+            if (writer) {
+                try {
+                    await writer.write(new TextEncoder().encode(payload));
+                } catch (e) { console.error("Serial error:", e); }
+            }
+        }
+
+        // Click to pick Hue
+        canvas.addEventListener('mousedown', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left - radius;
+            const y = e.clientY - rect.top - radius;
+            currentHue = (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+            updateAndSend();
+        });
+
+        document.getElementById('sat').addEventListener('input', updateAndSend);
+        document.getElementById('lum').addEventListener('input', updateAndSend);
+
+        // Web Serial Connection
+        document.getElementById('connectBtn').addEventListener('click', async () => {
+            try {
+                port = await navigator.serial.requestPort();
+                await port.open({ baudRate: 115200 });
+                writer = port.writable.getWriter();
+                document.getElementById('connectBtn').innerText = "CONNECTED";
+                document.getElementById('connectBtn').classList.add('active');
+            } catch (e) { console.error(e); }
+        });
+    </script>
+</body>
+</html>

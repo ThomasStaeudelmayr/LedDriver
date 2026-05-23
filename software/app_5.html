@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RGBW Controller Fixed</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #0a0a0a; color: white; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .card { background: #161616; padding: 30px; border-radius: 25px; width: 350px; text-align: center; box-shadow: 0 15px 50px rgba(0,0,0,0.8); border: 1px solid #222; }
+        
+        canvas { border-radius: 50%; cursor: crosshair; margin: 20px 0; border: 5px solid #222; background: #000; }
+        
+        .slider-group { margin: 20px 0; text-align: left; }
+        label { display: block; font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+        
+        input[type="range"] { width: 100%; height: 6px; border-radius: 3px; background: #333; accent-color: #00e676; cursor: pointer; -webkit-appearance: none; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: #00e676; border-radius: 50%; border: 2px solid #000; }
+
+        #connectBtn { background: #00e676; color: black; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s; margin-bottom: 10px; }
+        #connectBtn.active { background: #1a1a1a; color: #00e676; border: 1px solid #333; }
+        
+        .val-preview { font-family: 'Courier New', monospace; color: #00e676; background: #000; padding: 12px; border-radius: 8px; margin-top: 20px; font-size: 14px; border: 1px solid #333; }
+    </style>
+</head>
+<body>
+
+    <button id="connectBtn">CONNECT TO DEVICE</button>
+
+    <div class="card">
+        <canvas id="colorWheel" width="300" height="300"></canvas>
+        
+        <div class="slider-group">
+            <label>Saturation</label>
+            <input type="range" id="sat" min="0" max="100" value="100">
+        </div>
+
+        <div class="slider-group">
+            <label>Luminance</label>
+            <input type="range" id="lum" min="0" max="100" value="100">
+        </div>
+
+        <div id="debug" class="val-preview">R:0 G:0 B:0 W:0</div>
+    </div>
+
+    <script>
+        let port, writer;
+        const canvas = document.getElementById('colorWheel');
+        const ctx = canvas.getContext('2d');
+        const cx = canvas.width / 2;
+        const cy = canvas.height / 2;
+        const maxPwm = 1023;
+
+        let state = { h: 0, s: 100, l: 100 };
+        let indicator = { x: 0, y: 0, visible: false };
+
+        function drawWheel() {
+            // CRITICAL: Clear the canvas entirely before redrawing
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 1. Draw Ring
+            for (let angle = 0; angle < 360; angle++) {
+                let startAngle = (angle - 1) * Math.PI / 180;
+                let endAngle = (angle + 1) * Math.PI / 180;
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.arc(cx, cy, cx * 0.95, startAngle, endAngle);
+                ctx.fillStyle = `hsl(${angle}, 100%, 50%)`;
+                ctx.fill();
+            }
+
+            // 2. Cut out center
+            ctx.beginPath();
+            ctx.arc(cx, cy, cx * 0.45, 0, 2 * Math.PI);
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.fill();
+            ctx.globalCompositeOperation = 'source-over';
+
+            // 3. Draw Indicator
+            if (indicator.visible) {
+                ctx.beginPath();
+                ctx.arc(indicator.x, indicator.y, 12, 0, 2 * Math.PI);
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = '#ffffff';
+                ctx.stroke();
+                // Inner circle for contrast
+                ctx.beginPath();
+                ctx.arc(indicator.x, indicator.y, 8, 0, 2 * Math.PI);
+                ctx.fillStyle = `hsl(${state.h}, ${state.s}%, ${state.l/2+25}%)`; 
+                ctx.fill();
+            }
+        }
+
+        function calculateRGBW(h, s, l) {
+            s /= 100; l /= 100;
+            const k = n => (n + h / 30) % 12;
+            const a = s * 0.5;
+            const f = n => 0.5 - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+            return {
+                r: Math.round(f(0) * 2 * l * maxPwm),
+                g: Math.round(f(8) * 2 * l * maxPwm),
+                b: Math.round(f(4) * 2 * l * maxPwm),
+                w: 0
+            };
+        }
+
+        async function updateAndSend() {
+            state.s = parseInt(document.getElementById('sat').value);
+            state.l = parseInt(document.getElementById('lum').value);
+
+            drawWheel();
+
+            const rgbw = calculateRGBW(state.h, state.s, state.l);
+            const payload = `${rgbw.r}:${rgbw.g}:${rgbw.b}:${rgbw.w}\n`;
+            document.getElementById('debug').innerText = payload.trim();
+
+            if (writer) {
+                try {
+                    await writer.write(new TextEncoder().encode(payload));
+                } catch (e) { console.error(e); }
+            }
+        }
+
+        function handleInteraction(e) {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            const x = clientX - rect.left - cx;
+            const y = clientY - rect.top - cy;
+
+            const dist = Math.sqrt(x*x + y*y);
+            const outerRadius = cx * 0.95;
+            const innerRadius = cx * 0.45;
+
+            // If user clicks near the ring, we clamp the indicator to the center of the ring
+            if (dist > innerRadius - 20 && dist < outerRadius + 20) {
+                state.h = (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+                
+                // Snap indicator to the middle of the color band
+                const ringMidpoint = (innerRadius + outerRadius) / 2;
+                const angle = Math.atan2(y, x);
+                
+                indicator.x = cx + Math.cos(angle) * ringMidpoint;
+                indicator.y = cy + Math.sin(angle) * ringMidpoint;
+                indicator.visible = true;
+
+                updateAndSend();
+            }
+        }
+
+        canvas.addEventListener('mousedown', handleInteraction);
+        canvas.addEventListener('touchstart', handleInteraction);
+        canvas.addEventListener('touchmove', handleInteraction);
+        document.getElementById('sat').addEventListener('input', updateAndSend);
+        document.getElementById('lum').addEventListener('input', updateAndSend);
+
+        drawWheel();
+
+        document.getElementById('connectBtn').addEventListener('click', async () => {
+            try {
+                port = await navigator.serial.requestPort();
+                await port.open({ baudRate: 115200 });
+                writer = port.writable.getWriter();
+                document.getElementById('connectBtn').innerText = "CONNECTED";
+                document.getElementById('connectBtn').classList.add('active');
+            } catch (e) { console.error(e); }
+        });
+    </script>
+</body>
+</html>

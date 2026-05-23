@@ -1,13 +1,13 @@
 #ESP32 #Arduino
 
-![[DSCF5375.jpg|590]]
+<img src="assets\ledDriver_cc.JPG" width="700">
 
 This projects consists of two different hardware designs. Both are 4 channel LED drivers. The CC version can drive RGBW Power LEDs like the Cree XLamp Color Series and the CV Driver has 4 Mosfets that allow dimming of RGBW LED Strips. Both use a ESP32-S3 Zero as Microcontroller that can dim the LEDs at various frequencies.
 
 ## Hardware
 ### LED Driver CC
 
-![[Screenshot 2025-11-15 184011.jpg|540]]
+<img src="assets\ledDriver_cc_kicad.jpg" width="500">
 
 The CC Version is built around the LM3404 Led driver IC. Its a switching regulator that drives the connected LEDs in constant current mode eliminating the need for current limiting resistors and therefore increasing efficiency. 
 #### Current Sens Resistor 
@@ -36,7 +36,7 @@ $R_{SNS} = \frac{V_{REF}}{I_F} = \frac{0.2\text{ V}}{I_F}$
 
 ### LED Driver CV
 
-![[Screenshot 2025-11-15 203828.jpg|540]]
+<img src="assets\ledDriver_cv_kicad.jpg" width="500">
 
 The CV Version of the Led driver uses 4 Mosfets controlled via Mosfet. It is designed to cointrol RGBW LED Strips that already have current limitation built in. 
 The mosfet drivers allow fast rise times, therfore reducing the power loss while switching. 

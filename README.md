@@ -56,6 +56,7 @@ The constant voltage version is designed for standard 12V/24V RGBW LED strips wi
 | 9V DCDC Converter    | 1        | TSRN 1-2490          | Reichelt   |
 | MCP1416 SOT-23-5     | 4        | 579-MCP1416RTEOTVAO  | Mouser     |
 | Mosfet STD80N6F6     | 4        | 511-STD80N6F6        | Mouser     |
+| Fuse 5A              | 1        | 576-0454005.NR     | Mouser     |
 | Capacitor 10uF 1210  | 4        | -                    | -          |
 | Capacitor 100nF 0805 | 4        | -                    | -          |
 | Resistor 10R 0805    | 4        | -                    | -          |

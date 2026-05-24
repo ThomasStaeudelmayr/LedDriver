@@ -1,6 +1,6 @@
 <img src="assets\ledDriver_cc.JPG" width="700">
 
-This repository contains two distinct 4-channel LED driver hardware designs controlled by an **ESP32-S3 Zero**. Both versions support pulse-width modulation (PWM) dimming.
+This repository contains two distinct 4-channel LED driver hardware designs controlled by an **ESP32-S3 Zero**. Both versions support pulse-width modulation dimming.
 
 - **Constant Current (CC) Driver:** Designed for high-power LEDs (like the Cree XLamp Color Series) that require current regulation.
     

@@ -11,6 +11,8 @@ This repository contains two distinct 4-channel LED driver hardware designs cont
 
 <img src="assets\ledDriver_cc_kicad.JPG" width="500">
 
+![[assets\ledDriver_cc_kicad.JPG|313]]
+
 The CC version is built around the **LM3404** LED driver IC. This is a buck (step-down) switching regulator that drives the connected LEDs in constant current mode, eliminating the need for current-limiting resistors and increasing system efficiency.
 #### Current Sense Resistor Calculation
 The maximum forward current ($I_F$) delivered to the LEDs is determined by the value of the sense resistor ($R_{SNS}$) connected to the `CS` pin. Use the following formula to select your resistor value:

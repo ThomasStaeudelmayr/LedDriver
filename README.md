@@ -20,7 +20,7 @@ $$R_{SNS} = \frac{V_{REF}}{I_F} = \frac{0.2\text{ V}}{I_F}$$
 Using a 0.2 $\Omega$ resistor sets the maximum forward current to 1.0 A.
 
 #### Parts
-| Part name                 | Quantity | Order number       | Distibuter |
+| Part name                 | Quantity | Order number       | Distributor |
 | ------------------------- | -------- | ------------------ | ---------- |
 | ESP32-S3-Zero             | 1        | B0GV459V87         | Amazon     |
 | LM3404                    | 4        | LM 3404 MA         | Reichelt   |
@@ -30,14 +30,13 @@ Using a 0.2 $\Omega$ resistor sets the maximum forward current to 1.0 A.
 | DCDC Converter            | 1        | LME78_05-1.0       | Reichelt   |
 | MCV_1,5_8-G-3.81          | 1        | 220-4888           | RS         |
 | Fuse 5A                   | 1        | 576-0454005.NR     | Mouser     |
-| MCV_1,5_8-G-3.81          | 1        | 220-4888           | RS         |
 | MSTBVA 2-G 5,08           | 1        | STBVA 2-G 5,08     | Reichelt   |
 | Capacitor 470uF 10x10 25V | 2        | -                  | -          |
 | Capacitor 470nF 1210      | 4        | -                  | -          |
 | Capacitor 2.2uF  1206     | 4        | -                  | -          |
 | Capacitor 100nF 1206      | 8        | -                  | -          |
 | Capacitor 10uF 1210       | 6        | -                  | -          |
-| Resistor 536k             | 4        | -                  | -          |
+| Resistor 500k 0805        | 4        | -                  | -          |
 
 ### LED Driver CV
 
@@ -45,7 +44,7 @@ Using a 0.2 $\Omega$ resistor sets the maximum forward current to 1.0 A.
 
 The constant voltage version is designed for standard 12V/24V RGBW LED strips with integrated current-limiting resistors, utilizing 4 power MOSFETs as low-side switches. Dedicated gate drivers rapidly charge the MOSFET gate capacitance. The resulting fast rise and fall times minimize switching power losses during high-frequency PWM operation.
 #### Parts
-| Part name            | Quantity | Order number         | Distibuter |
+| Part name            | Quantity | Order number         | Distributor |
 | -------------------- | -------- | -------------------- | ---------- |
 | ESP32-S3-Zero        | 1        | B0GV459V87           | Amazon     |
 | MCV_1,5_5-G-3.81     | 1        | 651-1803455          | Mouser     |
@@ -104,7 +103,7 @@ You can type this manually into the Arduino Serial Monitor or automate it using 
 5. execute 
 
 ### Web Server Example
-The Web Server example eliminates the need for a dedicated transmitter controller. The ESP32 on the driver board will act as a webserver. After altering the wifi name and password and uploading the code the leds can be controlled on: http://ledcontrol.local
+The Web Server example eliminates the need for a dedicated transmitter controller. The ESP32 on the driver board will act as a web server. After altering the Wi-Fi name and password and uploading the code the leds can be controlled on: http://ledcontrol.local
 
 
 

@@ -105,16 +105,6 @@ You can type this manually into the Arduino Serial Monitor or automate it using 
 
 ### Web Server Example
 The Web Server example eliminates the need for a dedicated transmitter controller. The ESP32 on the driver board will act as a webserver. After altering the wifi name and password and uploading the code the leds can be controlled on: http://ledcontrol.local
-#### Setup and Configuration
-1. Open the **Web Server Code** in your IDE.
-2. Find the network configuration lines and change them to your home Wi-Fi details:
-```cpp
-const char* ssid = "Your_WiFi_Name"; 
-const char* password = "Your_WiFi_Password";
-```
-3. Upload the code to your ESP.
-#### How to Use It
-Once the board boots up and successfully connects to your Wi-Fi router, simply open any web browser on a device connected to the same network and type in: http://ledcontrol.local. This will open up a local webpage interface where you can adjust the LED colors directly.
 
 
 

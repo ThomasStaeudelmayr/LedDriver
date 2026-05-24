@@ -11,15 +11,13 @@ This repository contains two distinct 4-channel LED driver hardware designs cont
 
 <img src="assets\ledDriver_cc_kicad.jpg" width="500">
 
-![[assets\ledDriver_cc_kicad.JPG|313]]
-
-The CC version is built around the **LM3404** LED driver IC. This is a buck (step-down) switching regulator that drives the connected LEDs in constant current mode, eliminating the need for current-limiting resistors and increasing system efficiency.
+The CC version is built around the **LM3404** LED driver IC. This is a step-down switching regulator that drives the connected LEDs in constant current mode, eliminating the need for current-limiting resistors and increasing system efficiency.
 #### Current Sense Resistor Calculation
 The maximum forward current ($I_F$) delivered to the LEDs is determined by the value of the sense resistor ($R_{SNS}$) connected to the `CS` pin. Use the following formula to select your resistor value:
 
 $$R_{SNS} = \frac{V_{REF}}{I_F} = \frac{0.2\text{ V}}{I_F}$$
 
-Using a 0.2 $\Omega$ resistor sets the maximum forward current to exactly 1.0 A.
+Using a 0.2 $\Omega$ resistor sets the maximum forward current to 1.0 A.
 
 #### Parts
 | Part name                 | Quantity | Order number       | Distibuter |
@@ -45,7 +43,7 @@ Using a 0.2 $\Omega$ resistor sets the maximum forward current to exactly 1.0 A.
 
 <img src="assets\ledDriver_cv_kicad.jpg" width="500">
 
-Designed for standard 12V/24V RGBW LED strips with integrated current-limiting resistors, utilizing 4 power MOSFETs as low-side switches. Dedicated gate drivers rapidly charge the MOSFET gate capacitance. The resulting fast rise and fall times minimize switching power losses during high-frequency PWM operation.
+The constant voltage version is designed for standard 12V/24V RGBW LED strips with integrated current-limiting resistors, utilizing 4 power MOSFETs as low-side switches. Dedicated gate drivers rapidly charge the MOSFET gate capacitance. The resulting fast rise and fall times minimize switching power losses during high-frequency PWM operation.
 #### Parts
 | Part name            | Quantity | Order number         | Distibuter |
 | -------------------- | -------- | -------------------- | ---------- |
@@ -68,13 +66,13 @@ Designed for standard 12V/24V RGBW LED strips with integrated current-limiting r
 ### ESP-NOW Control Example
 
 The PC sends color values over a USB serial connection to the **Led Driver Bridge**, which then wirelessly sends those values to the **Led Driver Receiver**. 
-##### 1. Get the Receiver's MAC Address
+#### 1. Get the Receiver's MAC Address
 To pair the devices, you need the unique MAC address of the receiver board.
 1. Upload the **Receiver Code** to your LED driver board.
 2. Open the Serial Monitor. On startup, the ESP32 will print its MAC address.
 3. Copy this address; you will need it for the transmitter code.
     
-##### 2. Transmitter Configuration & Operation
+#### 2. Transmitter/Bridge Configuration & Operation
 The transmitter connects to your PC via USB, listens for incoming serial data, and forwards it wirelessly.
 1. Open the **Transmitter Code**.
 2. Replace the placeholder bytes with your receiver's MAC address
@@ -90,7 +88,7 @@ The bridge ESP expects a single string formatted as `R:G:B:W` followed by a newl
 
 **Example:** `1024:255:150:360` 
 
-You can type this manually into the Arduino Serial Monitor or automate it using a program. This repository contains a 2 python and one html example that generate the rgbw values. Once the transmitter gets a valid message, it splits the string into individual color values and sends them out over ESP-NOW. 
+You can type this manually into the Arduino Serial Monitor or automate it using a program. This repository contains two python and one html example that generate the rgbw values. Once the transmitter gets a valid message, it splits the string into individual color values and sends them out over ESP-NOW. 
 
 **LedDriver_web_app_rgbw.html** - control leds via a browser 
 **LedDriver_control_hsv.py** - control leds via a python script 
@@ -99,7 +97,7 @@ You can type this manually into the Arduino Serial Monitor or automate it using 
 <img src="assets\web_app.jpg" width="350">
 
 #### How to execute Python Scripts 
-1. In folder open cmd 
+1. In folder open CMD
 2. generate environment (python -m venv env)
 3. open environment via activate.bat
 4. install modules using pip

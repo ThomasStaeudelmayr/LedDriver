@@ -9,7 +9,7 @@ This repository contains two distinct 4-channel LED driver hardware designs cont
 ## Hardware
 ### LED Driver CC
 
-<img src="assets\ledDriver_cc_kicad.JPG" width="500">
+<img src="assets\ledDriver_cc_kicad.jpg" width="500">
 
 ![[assets\ledDriver_cc_kicad.JPG|313]]
 
@@ -43,7 +43,7 @@ Using a 0.2 $\Omega$ resistor sets the maximum forward current to exactly 1.0 A.
 
 ### LED Driver CV
 
-<img src="assets\ledDriver_cv_kicad.JPG" width="500">
+<img src="assets\ledDriver_cv_kicad.jpg" width="500">
 
 Designed for standard 12V/24V RGBW LED strips with integrated current-limiting resistors, utilizing 4 power MOSFETs as low-side switches. Dedicated gate drivers rapidly charge the MOSFET gate capacitance. The resulting fast rise and fall times minimize switching power losses during high-frequency PWM operation.
 #### Parts
@@ -96,7 +96,7 @@ You can type this manually into the Arduino Serial Monitor or automate it using 
 **LedDriver_control_hsv.py** - control leds via a python script 
 **LedDriver_rgbw_waves.py** - python script that generates led animation 
 
-<img src="assets\web_app.jpg" width="500">
+<img src="assets\web_app.jpg" width="350">
 
 #### How to execute Python Scripts 
 1. In folder open cmd 

@@ -1,12 +1,27 @@
+/*
+ * ====================================================================
+ * Project:      RGBW Led Driver Controller
+ * Description:  Hosts an internal web page allowing real-time adjustment
+ * of 4 PWM channels.
+ * Target Board: ESP32-S3 Zero
+ * ====================================================================
+ */
+
 #include <WiFi.h>
 #include <WebServer.h>
 #include <ESPmDNS.h>
 
 // --- WiFi Credentials ---
-const char* ssid = "WLAN19064339";
-const char* password = "SfffaddchSu5";
-// --- Pin Definitions ---
-const int pins[] = {13, 12, 11, 10}; 
+const char* ssid = "YOUR_WIFI_SSID";
+const char* password = "YOUR_WIFI_PASSWORD";
+
+
+// --- Pin & PWM Definitions ---
+const int pins[] = {10, 11, 12, 13}; 
+
+// Locked to your target hardware parameters
+const uint32_t PWM_FREQ = 1000;  // 1 kHz Frequency
+const uint8_t PWM_RES   = 10;    // 10-bit Resolution (0 - 1023)
 
 WebServer server(80);
 
@@ -26,25 +41,25 @@ const char PAGE_MAIN[] PROGMEM = R"=====(
     </style>
 </head>
 <body>
-    <h2>ESP32-S3 Zero Control</h2>
+    <h2>Led Driver Control</h2>
     <div class="card">
-        <p>Channel 1 (D13)</p>
-        <input type="range" min="0" max="255" value="0" oninput="update(1, this.value)">
+        <p>Channel 1 (red) </p>
+        <input type="range" min="0" max="1023" value="0" oninput="update(1, this.value)">
         <div class="val-display" id="val1">0</div>
     </div>
     <div class="card">
-        <p>Channel 2 (D12)</p>
-        <input type="range" min="0" max="255" value="0" oninput="update(2, this.value)">
+        <p>Channel 2 (green)</p>
+        <input type="range" min="0" max="1023" value="0" oninput="update(2, this.value)">
         <div class="val-display" id="val2">0</div>
     </div>
     <div class="card">
-        <p>Channel 3 (D11)</p>
-        <input type="range" min="0" max="255" value="0" oninput="update(3, this.value)">
+        <p>Channel 3 (blue)</p>
+        <input type="range" min="0" max="1023" value="0" oninput="update(3, this.value)">
         <div class="val-display" id="val3">0</div>
     </div>
     <div class="card">
-        <p>Channel 4 (D10)</p>
-        <input type="range" min="0" max="255" value="0" oninput="update(4, this.value)">
+        <p>Channel 4 (white)</p>
+        <input type="range" min="0" max="1023" value="0" oninput="update(4, this.value)">
         <div class="val-display" id="val4">0</div>
     </div>
 
@@ -66,8 +81,14 @@ void handleUpdate() {
   if (server.hasArg("ch") && server.hasArg("val")) {
     int ch = server.arg("ch").toInt();
     int val = server.arg("val").toInt();
+    
     if (ch >= 1 && ch <= 4) {
-      analogWrite(pins[ch-1], val);
+      // Guard bounds to keep values within 10-bit hardware boundaries
+      if(val > 1023) val = 1023;
+      if(val < 0) val = 0;
+
+      // Updated native ESP32 API call for writing duty cycle changes
+      ledcWrite(pins[ch-1], val);
     }
     server.send(200, "text/plain", "OK");
   }
@@ -76,25 +97,25 @@ void handleUpdate() {
 void setup() {
   Serial.begin(115200);
   
-  // Set pins as outputs
-  for(int i=0; i<4; i++) {
-    pinMode(pins[i], OUTPUT);
-    analogWrite(pins[i], 0);
+  // Initialize pins using the modern ESP32 LEDC API
+  for(int i = 0; i < 4; i++) {
+    // Under Arduino ESP32 core v3.x+, ledcAttach combines initialization and routing automatically
+    ledcAttach(pins[i], PWM_FREQ, PWM_RES);
+    ledcWrite(pins[i], 0); // Start off
   }
 
   // Connect to WiFi
   WiFi.begin(ssid, password);
-  Serial.print("Connecting");
+  Serial.print("Connecting to Wi-Fi");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
+  Serial.println("\nConnected!");
 
   // --- START MDNS ---
-  // This allows you to use http://ledcontrol.local instead of the IP
   if (MDNS.begin("ledcontrol")) {
-    Serial.println("\nmDNS responder started");
-    Serial.println("Access at: http://ledcontrol.local");
+    Serial.println("Access dashboard at: http://ledcontrol.local");
   }
 
   Serial.print("IP Address: ");
@@ -107,6 +128,4 @@ void setup() {
 
 void loop() {
   server.handleClient();
-  // Optional: keep mDNS running on some older ESP versions
-  // MDNS.update(); 
 }

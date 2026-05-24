@@ -93,7 +93,7 @@ if ser is None:
     exit(1)
 
 app = ctk.CTk()
-app.title("10-Bit HSV Driver Panel")
+app.title("10-Bit HSV Led Driver Panel")
 app.geometry("420x520")
 app.resizable(False, False)
 
